@@ -19,3 +19,29 @@ const observer = new IntersectionObserver(
 );
 
 revealTargets.forEach((el) => observer.observe(el));
+
+// Theme toggle: follows the system setting until the visitor picks one.
+const themeRoot = document.documentElement;
+const themeToggle = document.getElementById("theme-toggle");
+const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+function currentTheme() {
+  return themeRoot.dataset.theme || (systemDark.matches ? "dark" : "light");
+}
+
+function syncThemeToggle() {
+  const next = currentTheme() === "dark" ? "light" : "dark";
+  themeToggle.textContent = next === "dark" ? "Dark mode" : "Light mode";
+  themeToggle.setAttribute("aria-label", `Switch to ${next} theme`);
+}
+
+themeToggle.addEventListener("click", () => {
+  themeRoot.dataset.theme = currentTheme() === "dark" ? "light" : "dark";
+  syncThemeToggle();
+});
+
+systemDark.addEventListener("change", () => {
+  if (!themeRoot.dataset.theme) syncThemeToggle();
+});
+
+syncThemeToggle();
